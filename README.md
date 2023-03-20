@@ -18,3 +18,111 @@ Eu voi avea în total 9 tabele în baza de date.
 - GAME_TAGS - Deoarece este o relație Many to Many dintre taguri și jocuri, avem acest tabel.
 - COMMENT - Pentru comentarii am mai făcut o tabelă cu mesajul, utilizatorul autor și utilizatorul destinatar. 
 - REVIEW - Pentru recenzii am făcut tabela care să conțină mesajul, autorul, jocul destinatar și nota dată.
+
+@startuml
+
+title Database Diagram
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "User" as user {
+  *id : int
+  --
+  *username : varchar
+  *password : varchar
+  *email : varchar
+  *permissions : int
+  *hours_this_week : float
+  *date_joined : date
+  country_id : int
+  icon_url : varchar
+  cover_url : varchar
+  bio : varchar
+}
+
+entity "Country" as country {
+  *id : int
+  --
+  *name : varchar
+  *currency_name : varchar
+  *currency_in_euro : float
+  flag_url : varchar
+}
+
+entity "Comment" as comment{
+  *id : int
+  --
+  *profile_id: int
+  *author_id: int
+  *message : varchar
+  *date : date
+}
+
+entity "Game" as game {
+  *id : int
+  --
+  *name : varchar
+  *developer_id : int
+  *release_date : date
+  *price_euro : float
+  *sales : int
+  discount_percent : int
+  discount_end : date
+  icon_url : varchar
+  description : varchar
+  system : varchar
+}
+
+entity "Game_images" as game_images {
+  *id : int
+  --
+  *game_id : int
+  *image_url : varchar
+}
+
+entity "Tag" as tag {
+  *name : varchar
+}
+
+entity "Game_tags" as game_tags {
+  *id : int
+  --
+  *game_id : int
+  *tag_name : varchar
+}
+
+entity "Game_ownership" as game_ownership {
+  *id : int
+  --
+  *game_id : int
+  *user_id : int
+  *hours_played : float
+  last_played : date
+}
+
+entity "Review" as review {
+  *id : int
+  --
+  *user_id : int
+  *game_id : int
+  *rating : int
+  message : varchar
+}
+
+user }o--o| country
+comment }o--|| user
+comment }o--|| user
+review }o--|| user
+review }o--|| game
+game_ownership }o--|| user
+game_ownership }o--|| game
+game }o--|| user
+game_images }o--|| game
+game_tags }o--|| game
+game_tags}o--||tag
+
+@enduml
+
