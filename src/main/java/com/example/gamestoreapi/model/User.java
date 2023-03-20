@@ -11,13 +11,15 @@ import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
 import java.util.Objects;
 
+/**
+ * A model class for representing entries from the User table
+ */
 @Entity
 @Table(name = "USER")
 @Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
