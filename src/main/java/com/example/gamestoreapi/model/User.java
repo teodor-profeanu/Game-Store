@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotNull;
 
 import java.sql.Date;
+import java.util.Objects;
 
 @Entity
 @Table(name = "USER")
@@ -46,8 +47,11 @@ public class User {
     @Column(name = "DATE_JOINED")
     private Date dateJoined;
 
+    @Column(name = "NICKNAME")
+    private String nickname;
+
     @Column(name = "COUNTRY_ID")
-    private int countryID;
+    private int countryId;
 
     @Column(name = "ICON_URL")
     private String iconURL;
@@ -57,4 +61,17 @@ public class User {
 
     @Column(name = "BIO")
     private String bio;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && permissions == user.permissions && Float.compare(user.hoursThisWeek, hoursThisWeek) == 0 && countryId == user.countryId && username.equals(user.username) && email.equals(user.email) && password.equals(user.password) && Objects.equals(dateJoined, user.dateJoined) && Objects.equals(nickname, user.nickname) && Objects.equals(iconURL, user.iconURL) && Objects.equals(coverURL, user.coverURL) && Objects.equals(bio, user.bio);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email, password, permissions, hoursThisWeek, dateJoined, nickname, countryId, iconURL, coverURL, bio);
+    }
 }
