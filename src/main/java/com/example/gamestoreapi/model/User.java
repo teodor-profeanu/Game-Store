@@ -38,6 +38,9 @@ public class User {
     @Column(name = "DATE_JOINED")
     private Date dateJoined;
 
+    @Column(name = "NICKNAME")
+    private String nickname;
+
     @Column(name = "ICON_URL")
     private String iconURL;
 

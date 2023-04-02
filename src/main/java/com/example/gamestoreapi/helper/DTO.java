@@ -1,4 +1,4 @@
-package com.example.gamestoreapi.dto;
+package com.example.gamestoreapi.helper;
 
 import lombok.Data;
 

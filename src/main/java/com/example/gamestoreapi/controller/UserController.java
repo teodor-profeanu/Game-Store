@@ -1,6 +1,6 @@
 package com.example.gamestoreapi.controller;
 
-import com.example.gamestoreapi.dto.DTO;
+import com.example.gamestoreapi.helper.DTO;
 import com.example.gamestoreapi.model.User;
 import com.example.gamestoreapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +24,19 @@ public class UserController {
         return userService.login(usernameEmail, password);
     }
 
+    @GetMapping("/user")
+    public DTO<User> get(@RequestParam Integer userId){
+        return userService.get(userId);
+    }
+
     @PostMapping("/user/register")
     public DTO<Boolean> register(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam String repeatPassword){
         return userService.register(username, email, password, repeatPassword);
     }
 
     @PutMapping("/user/edit")
-    public DTO<Boolean> edit(@RequestParam Integer userId, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String coverURL, @RequestParam(defaultValue = "") String bio){
-        return userService.edit(userId, iconURL, coverURL, bio);
+    public DTO<Boolean> edit(@RequestParam Integer userId, @RequestParam(defaultValue = "") String nickname, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String coverURL, @RequestParam(defaultValue = "") String bio){
+        return userService.edit(userId, nickname, iconURL, coverURL, bio);
     }
 
     @PutMapping("/user/changePassword")

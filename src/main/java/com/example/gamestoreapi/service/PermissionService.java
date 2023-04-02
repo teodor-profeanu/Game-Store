@@ -8,6 +8,9 @@ import java.util.Optional;
 
 import com.example.gamestoreapi.GlobalTags;
 
+/**
+ * Class for managing the Permission table, initializes the table with the 3 types of user ADMIN, DEV and USER.
+ */
 @Service
 public class PermissionService {
     private final PermissionRepo permissionRepo;

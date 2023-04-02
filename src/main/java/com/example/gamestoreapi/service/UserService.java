@@ -1,6 +1,6 @@
 package com.example.gamestoreapi.service;
 
-import com.example.gamestoreapi.dto.DTO;
+import com.example.gamestoreapi.helper.DTO;
 import com.example.gamestoreapi.model.User;
 import com.example.gamestoreapi.repository.PermissionRepo;
 import com.example.gamestoreapi.repository.UserRepo;
@@ -23,7 +23,7 @@ public class UserService {
      * @param usernameEmail Username or email
      * @return Data transfer object with the status, message and user
      */
-    public DTO login(String usernameEmail, String password){
+    public DTO<User> login(String usernameEmail, String password){
         Optional<User> optionalUser=userRepo.findByUsername(usernameEmail);
         if(optionalUser.isEmpty()){
             optionalUser = userRepo.findByEmail(usernameEmail);
@@ -34,6 +34,17 @@ public class UserService {
         if(user.getPassword().compareTo(password)!=0)
             return new DTO<User>(403, "Wrong user or password.", null);
         return new DTO<User>(200, "Login successful.", user);
+    }
+
+    /**
+     * This method returns the user of hte given ID.
+     * @return Data transfer object with the status, message and user
+     */
+    public DTO<User> get(Integer userId){
+        Optional<User> optionalUser=userRepo.findById(userId);
+        if(optionalUser.isEmpty())
+            return new DTO<User>(404, "User not found.", null);
+        return new DTO<User>(200, "User found.", optionalUser.get());
     }
 
     /**
@@ -56,7 +67,7 @@ public class UserService {
         if(emailOptional.isPresent())
             return new DTO<Boolean>(400, "Email already taken.", false);
 
-        User user = new User(0, username, email, password, permissionRepo.findByName(GlobalTags.USER).get().getId(), new Date(System.currentTimeMillis()), null, null, "");
+        User user = new User(0, username, email, password, permissionRepo.findByName(GlobalTags.USER).get().getId(), new Date(System.currentTimeMillis()), null, null, null, "");
         userRepo.save(user);
         return new DTO<Boolean>(200, "Register successful.", true);
     }
@@ -65,12 +76,13 @@ public class UserService {
      * This method retrieves the user with the given ID, it makes the necessary changes, and then it saves it back in the DB.
      * @return Data transfer object with the status, message and a Boolean value
      */
-    public DTO<Boolean> edit(Integer userId, String iconURL, String coverURL, String bio){
+    public DTO<Boolean> edit(Integer userId, String nickname, String iconURL, String coverURL, String bio){
         Optional<User> optionalUser = userRepo.findById(userId);
         if(optionalUser.isEmpty())
             return new DTO<Boolean>(404, "User not found.", false);
 
         User user = optionalUser.get();
+        user.setNickname(nickname);
         user.setIconURL(iconURL);
         user.setCoverURL(coverURL);
         user.setBio(bio);
@@ -79,6 +91,10 @@ public class UserService {
         return new DTO<Boolean>(200, "Edit successful.", true);
     }
 
+    /**
+     * Changes the password in the database with the new password for the user with ID userId.
+     * @return Data transfer object with the status, message and a Boolean value
+     */
     public DTO<Boolean> changePassword(Integer userId, String oldPassword, String newPassword, String repeatPassword){
         Optional<User> optionalUser = userRepo.findById(userId);
         if(optionalUser.isEmpty())
