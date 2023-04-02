@@ -54,7 +54,7 @@ public class UserService {
     public DTO<Boolean> register(String username, String email, String password, String repeatPassword){
         if(!Pattern.compile("^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+$").matcher(email).matches())
             return new DTO<Boolean>(400, "Invalid email.", false);
-        if(!Pattern.compile("^[a-zA-Z0-9.-]+$").matcher(username).matches() || username.length()<3)
+        if(!Pattern.compile("^[a-zA-Z0-9._-]+$").matcher(username).matches() || username.length()<3)
             return new DTO<Boolean>(400, "Invalid username.", false);
         if(password.length()<8)
             return new DTO<Boolean>(400, "Password must be at least 8 characters long.", false);

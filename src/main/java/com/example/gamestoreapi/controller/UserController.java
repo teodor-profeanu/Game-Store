@@ -25,8 +25,8 @@ public class UserController {
     }
 
     @GetMapping("/user")
-    public DTO<User> get(@RequestParam Integer userId){
-        return userService.get(userId);
+    public DTO<User> get(@RequestParam Integer id){
+        return userService.get(id);
     }
 
     @PostMapping("/user/register")
@@ -35,17 +35,17 @@ public class UserController {
     }
 
     @PutMapping("/user/edit")
-    public DTO<Boolean> edit(@RequestParam Integer userId, @RequestParam(defaultValue = "") String nickname, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String coverURL, @RequestParam(defaultValue = "") String bio){
-        return userService.edit(userId, nickname, iconURL, coverURL, bio);
+    public DTO<Boolean> edit(@RequestParam Integer id, @RequestParam(defaultValue = "") String nickname, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String coverURL, @RequestParam(defaultValue = "") String bio){
+        return userService.edit(id, nickname, iconURL, coverURL, bio);
     }
 
     @PutMapping("/user/changePassword")
-    public DTO<Boolean> changePassword(@RequestParam Integer userId, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String repeatPassword){
-        return userService.changePassword(userId, oldPassword, newPassword, repeatPassword);
+    public DTO<Boolean> changePassword(@RequestParam Integer id, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String repeatPassword){
+        return userService.changePassword(id, oldPassword, newPassword, repeatPassword);
     }
 
     @DeleteMapping("/user/delete")
-    public DTO<Boolean> delete(@RequestParam Integer userId){
-        return userService.delete(userId);
+    public DTO<Boolean> delete(@RequestParam Integer id){
+        return userService.delete(id);
     }
 }

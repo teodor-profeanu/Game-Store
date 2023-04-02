@@ -16,6 +16,18 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Game {
+
+    public Game(int id, String name, int developerId, Date releaseDate, float priceEuro, int sales, String iconURL, String description) {
+        this.id = id;
+        this.name = name;
+        this.developerId = developerId;
+        this.releaseDate = releaseDate;
+        this.priceEuro = priceEuro;
+        this.sales = sales;
+        this.iconURL = iconURL;
+        this.description = description;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
@@ -41,4 +53,8 @@ public class Game {
 
     @Column(name = "description")
     private String description;
+
+    private int nrOfReviews;
+    private float rating;
+    private int discountPercent;
 }
