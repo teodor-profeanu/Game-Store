@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import com.example.gamestoreapi.GlobalTags;
+import com.example.gamestoreapi.helper.GlobalTags;
 
 /**
  * Class for managing the Permission table, initializes the table with the 3 types of user ADMIN, DEV and USER.
@@ -15,6 +15,9 @@ import com.example.gamestoreapi.GlobalTags;
 public class PermissionService {
     private final PermissionRepo permissionRepo;
 
+    /**
+     * This constructor initializes the Permission table, such as it contains the 3 types of users, ADMIN, DEV, and USER.
+     */
     public PermissionService(PermissionRepo permissionRepo){
         this.permissionRepo = permissionRepo;
 

@@ -1,6 +1,6 @@
 package com.example.gamestoreapi.service;
 
-import com.example.gamestoreapi.GlobalTags;
+import com.example.gamestoreapi.helper.GlobalTags;
 import com.example.gamestoreapi.helper.DTO;
 import com.example.gamestoreapi.model.Discount;
 import com.example.gamestoreapi.model.Game;
@@ -26,6 +26,10 @@ public class GameService {
     private final DiscountRepo discountRepo;
     private final ReviewRepo reviewRepo;
 
+    /**
+     * Adds a new Game to the DB.
+     * @return A DTO containing the status, message, and a Boolean for whether the Game was addeed successfully.
+     */
     public DTO<Boolean> add(String name, Integer devId, float price, String iconURL, String description){
         Optional<User> optionalDev = userRepo.findById(devId);
         int devPermissionId = permissionRepo.findByName(GlobalTags.DEV).get().getId();
@@ -40,6 +44,9 @@ public class GameService {
         return new DTO<Boolean>(200, "Action successful.", true);
     }
 
+    /**
+     * Sets the rating, nrOfReviews and discount attributes of every Game from the given list
+     */
     public void setExtraAtt(List<Game> games){
         HashMap<Integer, Integer> reviewSums = new HashMap<>();
         HashMap<Integer, Integer> reviewNr = new HashMap<>();
@@ -76,6 +83,15 @@ public class GameService {
         }
     }
 
+    /**
+     * Filters the list of games based on the given paramers
+     * @param keywords Keeps games that contain any word from this String in their name
+     * @param priceMin Keeps games that have a price higher than this
+     * @param priceMax Keeps games that have a price lower than this
+     * @param discount Keeps games that have a discount
+     * @param tagIds Keeps games that contain any of these tags //TODO
+     * @return The processed list
+     */
     public List<Game> filter(List<Game> games,String keywords, int priceMin, int priceMax, boolean discount, String tagIds){
         games = games.stream().filter(n -> n.getPriceEuro()>=priceMin && n.getPriceEuro()<=priceMax).collect(Collectors.toList());
 
@@ -96,6 +112,15 @@ public class GameService {
         return games;
     }
 
+    /**
+     * Sorts the given game list based on one the parameters, and whether it's value is ASCENDING or DESCENDING.
+     * @param popularity Sorts based on number of sales
+     * @param rating Sorts based on the rating
+     * @param reviews Sorts based on number of reviews
+     * @param date Sorts based on realese date
+     * @param price Sorts based on price
+     * @return The processed list
+     */
     public List<Game> sort(List<Game> games, int popularity, int rating, int reviews, int date, int price){
         if(price == GlobalTags.ASCENDING)
             Collections.sort(games, (g1, g2) -> (int)((g1.getPriceEuro() - g2.getPriceEuro())*100));
@@ -120,6 +145,10 @@ public class GameService {
         return games;
     }
 
+    /**
+     * Sorts and filters the list of all games in the DB based on the given paramters
+     * @return A DTO containing the status, message and processed list
+     */
     public DTO<List<Game>> search(int popularity, int rating, int reviews, int date, int price, String keywords, int priceMin, int priceMax, boolean discount, String tagIds){
         Iterable<Game> gameIterable = gameRepo.findAll();
         List<Game> games = new ArrayList<>();
@@ -132,6 +161,10 @@ public class GameService {
         return new DTO<>(200, "Games found.", games);
     }
 
+    /**
+     * Retrieves the game with the given ID
+     * @return A DTO with the status, message and Game object
+     */
     public DTO<Game> get(int gameId){
         Optional<Game> optionalGame = gameRepo.findById(gameId);
         if(optionalGame.isEmpty())
@@ -139,6 +172,10 @@ public class GameService {
         return new DTO<Game>(200, "Game found.", optionalGame.get());
     }
 
+    /**
+     * This method retrieves the game with the given ID, it makes the necessary changes, and then it saves it back in the DB.
+     * @return Data transfer object with the status, message and a Boolean value
+     */
     public DTO<Boolean> edit(int gameId, String name, float price, String iconURL, String description){
         Optional<Game> optionalGame = gameRepo.findById(gameId);
         if(optionalGame.isEmpty())
@@ -154,6 +191,10 @@ public class GameService {
         return new DTO<Boolean>(200, "Edit successful.", true);
     }
 
+    /**
+     * This method retrieves the game with the given ID, and then it deletes it from the DB.
+     * @return Data transfer object with the status, message and a Boolean value
+     */
     public DTO<Boolean> delete(int gameId){
         Optional<Game> optionalGame = gameRepo.findById(gameId);
         if(optionalGame.isEmpty())

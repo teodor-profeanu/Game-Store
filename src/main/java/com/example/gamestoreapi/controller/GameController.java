@@ -1,15 +1,16 @@
 package com.example.gamestoreapi.controller;
 
-import com.example.gamestoreapi.GlobalTags;
 import com.example.gamestoreapi.helper.DTO;
 import com.example.gamestoreapi.model.Game;
 import com.example.gamestoreapi.service.GameService;
-import com.example.gamestoreapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * A controller class for handling http requests related to the Game table
+ */
 @RestController
 public class GameController {
     private GameService gameService;

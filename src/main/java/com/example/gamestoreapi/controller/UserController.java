@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * A controller class for handling http requests for the USER table
+ * A controller class for handling http requests related to the USER table
  */
 @RestController
 public class UserController {

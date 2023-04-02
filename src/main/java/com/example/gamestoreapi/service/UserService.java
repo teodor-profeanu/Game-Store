@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import com.example.gamestoreapi.GlobalTags;
+import com.example.gamestoreapi.helper.GlobalTags;
 
 @Service
 @AllArgsConstructor
