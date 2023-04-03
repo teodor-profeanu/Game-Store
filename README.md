@@ -8,7 +8,7 @@ Website-ul va avea 4 nivele de permisiuni pentru utilizatori, în funcție de co
 - Nivelul 3, developer: aceștia au nevoie de cont și un pas în plus de verificare. Ei au posibilitatea să își încarce jocurile proprii. Vor putea de asemenea să editeze detalii despre jocurile lor, să încarce poze și să adauge discounturi.
 - Nivelul 4, administrator: aceștia au voie să șteargă, să modifice și să adauge date din baza de date cu foarte puține constrângeri. Vor putea edita pagini de jocuri, să adauge sau să șteargă jocuri din librariile utilizatorilor și să pună discounturi.
 
-# Baza de date
+## Baza de date
 Eu voi avea în total 9 tabele în baza de date.
 - PERMISSION - Tabela pentru permisiunile existente, contine "admin", "dev" sau "user".
 - USER - Tabela pentru utilizatori conține detaliile despre ei dar și id-ul nivelului de permisiuni.
@@ -18,4 +18,10 @@ Eu voi avea în total 9 tabele în baza de date.
 - GAME_TAGS - Deoarece este o relație Many to Many dintre taguri și jocuri, avem acest tabel pentru a face asocierile necesare.
 - REVIEW - Pentru recenzii am făcut tabela care să conțină mesajul, autorul, jocul destinatar și nota dată.
 - GAME_OWNERSHIP - Detaliază jocurile deținute de diferiți jucători, precum și numărul de ore jucate de aceștia în cadrul jocurilor.
-- DISCOUNT - Tabela pentru a stoca dicounturi, conține jocul care primește discountul, data până când este valabil și dimensiunea discountului.
+- DISCOUNT - Tabelă pentru a stoca dicounturi, conține jocul care primește discountul, data până când este valabil și dimensiunea discountului.
+
+## Endpoints
+Toate requesturile returnează un obiect de tip DTO, care conține un int pentru status, un mesaj și obiectul care a fost cerut. Pentru interfața cu alte aplicații, acest API dispune de următoarele endpointuri:
+- GET /user/login - returnează un User în cazul în care a fost găsit cu emailul/username-ul și parola oferite ca parametrii. Exemplu: localhost:8080/user/login?usernameEmail=asmo_192&password=qwertyui
+- POST /user/register - înregistrează userul cu parametrii primiți și returnează True în cazul în care a fost înregistrat userul cu succes, altfel returnează false și codul 400. Exemplu : localhost:8080/user/register?username=dev&email=tores3@gmail.com&password=12345678&repeatPassword=12345678
+- PUT /user/edit - editează userul cu ID-ul dat și returnează True în cazul în care a fost editat userul cu succes. Exemplu: localhost:8080/user/edit?id=1&iconURL=staas
