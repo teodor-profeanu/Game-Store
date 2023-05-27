@@ -10,7 +10,7 @@ import java.util.Optional;
  * A repository class for the raw operations on the User table of the DB
  */
 @Repository
-public interface UserRepository extends JpaRepository<User,Integer> {
+public interface UserRepo extends JpaRepository<User,Integer> {
     /**
      * Retrieves the first user from the DB that has the username given as parameter.
      * @return An Optional that either contains the found User, or is empty.
