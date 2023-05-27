@@ -1,10 +1,14 @@
 package com.example.gamestoreapi.controller;
 
 import com.example.gamestoreapi.helper.DTO;
+import com.example.gamestoreapi.model.Game;
 import com.example.gamestoreapi.model.User;
+import com.example.gamestoreapi.service.GameService;
 import com.example.gamestoreapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * A controller class for handling http requests related to the USER table
@@ -13,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private UserService userService;
+    private GameService gameService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, GameService gameService) {
         this.userService = userService;
+        this.gameService = gameService;
     }
 
     @GetMapping("/user/login")
@@ -26,7 +32,12 @@ public class UserController {
 
     @GetMapping("/user")
     public DTO<User> get(@RequestParam Integer id){
-        return userService.get(id);
+        DTO<User> dto = userService.get(id);
+        if(dto.getObject() == null)
+            return dto;
+        List<Game> games = gameService.getGamesByUserId(id);
+        dto.getObject().setGames(games);
+        return dto;
     }
 
     @PostMapping("/user/register")
@@ -35,11 +46,11 @@ public class UserController {
     }
 
     @PutMapping("/user/edit")
-    public DTO<Boolean> edit(@RequestParam Integer id, @RequestParam(defaultValue = "") String nickname, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String coverURL, @RequestParam(defaultValue = "") String bio){
-        return userService.edit(id, nickname, iconURL, coverURL, bio);
+    public DTO<Boolean> edit(@RequestParam Integer id, @RequestParam(defaultValue = "") String nickname, @RequestParam(defaultValue = "") String iconURL, @RequestParam(defaultValue = "") String bio){
+        return userService.edit(id, nickname, iconURL, bio);
     }
 
-    @PutMapping("/user/changePassword")
+    @PutMapping("/user/change-password")
     public DTO<Boolean> changePassword(@RequestParam Integer id, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String repeatPassword){
         return userService.changePassword(id, oldPassword, newPassword, repeatPassword);
     }

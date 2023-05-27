@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import jakarta.validation.constraints.Pattern;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * A model class for representing entries from the User table
@@ -18,6 +19,18 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+    public User(int id, String username, String email, String password, int permissionId, Date dateJoined, String nickname, String iconURL, String bio) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.permissionId = permissionId;
+        this.dateJoined = dateJoined;
+        this.nickname = nickname;
+        this.iconURL = iconURL;
+        this.bio = bio;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
@@ -44,9 +57,9 @@ public class User {
     @Column(name = "ICON_URL")
     private String iconURL;
 
-    @Column(name = "COVER_URL")
-    private String coverURL;
-
     @Column(name = "BIO")
     private String bio;
+
+    @Transient
+    private List<Game> games;
 }

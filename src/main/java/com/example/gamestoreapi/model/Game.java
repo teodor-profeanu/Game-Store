@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * A model class for representing entries from the Game table
@@ -54,7 +56,31 @@ public class Game {
     @Column(name = "description")
     private String description;
 
+    @Transient
     private int nrOfReviews;
+
+    @Transient
     private float rating;
+
+    @Transient
     private int discountPercent;
+
+    @Transient
+    private boolean owned;
+
+    @Transient
+    private float hoursPlayed;
+
+    @Transient
+    private Date lastPlayed;
+
+    @Transient
+    private List<Tag> tags;
+
+    @Transient
+    private Iterable<GameImages> images;
+
+    @Transient
+    @JsonIgnore
+    private Integer tagsInCommon;
 }

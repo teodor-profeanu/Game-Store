@@ -14,6 +14,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Review {
+
+    public Review(int id, int gameId, int userId, int rating, String message) {
+        this.id = id;
+        this.gameId = gameId;
+        this.userId = userId;
+        this.rating = rating;
+        this.message = message;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
@@ -30,4 +39,7 @@ public class Review {
 
     @Column(name = "message")
     private String message;
+
+    @Transient
+    private User user;
 }

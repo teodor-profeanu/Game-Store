@@ -2,16 +2,14 @@ package com.example.gamestoreapi.service;
 
 import com.example.gamestoreapi.helper.GlobalTags;
 import com.example.gamestoreapi.helper.DTO;
-import com.example.gamestoreapi.model.Discount;
-import com.example.gamestoreapi.model.Game;
-import com.example.gamestoreapi.model.Review;
-import com.example.gamestoreapi.model.User;
+import com.example.gamestoreapi.model.*;
 import com.example.gamestoreapi.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +23,10 @@ public class GameService {
     private final PermissionRepo permissionRepo;
     private final DiscountRepo discountRepo;
     private final ReviewRepo reviewRepo;
+    private final GameOwnershipRepo gameOwnershipRepo;
+    private final TagRepo tagRepo;
+    private final GameTagsRepo gameTagsRepo;
+    private final GameImagesRepo gameImagesRepo;
 
     /**
      * Adds a new Game to the DB.
@@ -36,8 +38,8 @@ public class GameService {
         int adminPermissionId = permissionRepo.findByName(GlobalTags.ADMIN).get().getId();
         if(optionalDev.isEmpty() || optionalDev.get().getPermissionId() != devPermissionId && optionalDev.get().getPermissionId() != adminPermissionId)
             return new DTO<Boolean>(403, "Permission denied for action.", false);
-        if(name.length()<3)
-            return new DTO<Boolean>(400, "Name has to be at least 3 characters long.", false);
+        if(!Pattern.compile("^[a-zA-Z0-9._ -]+$").matcher(name).matches() || name.length()<3)
+            return new DTO<Boolean>(400, "Invalid name (must contain only alphanumerical characters and must be at least 3 characters long).", false);
 
         Game game = new Game(0, name, devId, new Date(System.currentTimeMillis()), price, 0, iconURL, description);
         gameRepo.save(game);
@@ -47,7 +49,7 @@ public class GameService {
     /**
      * Sets the rating, nrOfReviews and discount attributes of every Game from the given list
      */
-    public void setExtraAtt(List<Game> games){
+    public void setExtraAtt(List<Game> games, Integer userId){
         HashMap<Integer, Integer> reviewSums = new HashMap<>();
         HashMap<Integer, Integer> reviewNr = new HashMap<>();
         HashMap<Integer, Integer> discounts = new HashMap<>();
@@ -80,6 +82,22 @@ public class GameService {
             if(discounts.containsKey(game.getId())){
                 game.setDiscountPercent(discounts.get(game.getId()));
             }
+            Iterable<GameOwnership> gameOwnerships = gameOwnershipRepo.findAllByGameIdAndUserId(game.getId(), userId);
+            for(GameOwnership ownership : gameOwnerships){
+                game.setLastPlayed(ownership.getLastPlayed());
+                game.setOwned(true);
+                game.setHoursPlayed(ownership.getHoursPlayed());
+            }
+
+            Iterable<GameTags> gameTags = gameTagsRepo.findAllByGameId(game.getId());
+            List<Tag> tags = new ArrayList<>();
+            for(GameTags gameTag : gameTags){
+                tags.add(tagRepo.findById(gameTag.getTagId()).get());
+            }
+            game.setTags(tags);
+
+            Iterable<GameImages> gameImages = gameImagesRepo.findAllByGameId(game.getId());
+            game.setImages(gameImages);
         }
     }
 
@@ -117,11 +135,11 @@ public class GameService {
      * @param popularity Sorts based on number of sales
      * @param rating Sorts based on the rating
      * @param reviews Sorts based on number of reviews
-     * @param date Sorts based on realese date
+     * @param date Sorts based on release date
      * @param price Sorts based on price
      * @return The processed list
      */
-    public List<Game> sort(List<Game> games, int popularity, int rating, int reviews, int date, int price){
+    public List<Game> sort(List<Game> games, int popularity, int rating, int reviews, int date, int price, int trending){
         if(price == GlobalTags.ASCENDING)
             Collections.sort(games, (g1, g2) -> (int)((g1.getPriceEuro() - g2.getPriceEuro())*100));
         else if(price == GlobalTags.DESCENDING)
@@ -131,7 +149,7 @@ public class GameService {
         else if(date == GlobalTags.DESCENDING)
             Collections.sort(games, (g1, g2) -> (int)((g2.getReleaseDate().getTime() - g1.getReleaseDate().getTime())/86400000));
         else if(popularity == GlobalTags.ASCENDING)
-            Collections.sort(games, (g1, g2) -> g1.getSales() - g2.getSales());
+            Collections.sort(games, Comparator.comparingInt(Game::getSales));
         else if(popularity == GlobalTags.DESCENDING)
             Collections.sort(games, (g1, g2) -> g2.getSales() - g1.getSales());
         else if(rating == GlobalTags.ASCENDING)
@@ -139,9 +157,11 @@ public class GameService {
         else if(rating == GlobalTags.DESCENDING)
             Collections.sort(games, (g1, g2) -> (int)((g2.getRating() - g1.getRating())*100));
         else if(reviews == GlobalTags.ASCENDING)
-            Collections.sort(games, (g1, g2) -> g1.getNrOfReviews() - g2.getNrOfReviews());
+            Collections.sort(games, Comparator.comparingInt(Game::getNrOfReviews));
         else if(reviews == GlobalTags.DESCENDING)
             Collections.sort(games, (g1, g2) -> g2.getNrOfReviews() - g1.getNrOfReviews());
+        else if(trending == GlobalTags.ASCENDING)
+            Collections.sort(games, (g1, g2) -> (int)((g2.getRating() + g2.getDiscountPercent() - g1.getRating() - g1.getDiscountPercent())*100));
         return games;
     }
 
@@ -149,14 +169,13 @@ public class GameService {
      * Sorts and filters the list of all games in the DB based on the given paramters
      * @return A DTO containing the status, message and processed list
      */
-    public DTO<List<Game>> search(int popularity, int rating, int reviews, int date, int price, String keywords, int priceMin, int priceMax, boolean discount, String tagIds){
+    public DTO<List<Game>> search(Integer userId, int popularity, int rating, int reviews, int date, int price, int trending, String keywords, int priceMin, int priceMax, boolean discount, String tagIds){
         Iterable<Game> gameIterable = gameRepo.findAll();
         List<Game> games = new ArrayList<>();
         gameIterable.forEach(games::add);
-        setExtraAtt(games);
-
+        setExtraAtt(games, userId);
         games = filter(games, keywords, priceMin, priceMax, discount, tagIds);
-        games = sort(games, popularity, rating, reviews, date, price);
+        games = sort(games, popularity, rating, reviews, date, price, trending);
 
         return new DTO<>(200, "Games found.", games);
     }
@@ -165,11 +184,14 @@ public class GameService {
      * Retrieves the game with the given ID
      * @return A DTO with the status, message and Game object
      */
-    public DTO<Game> get(int gameId){
+    public DTO<Game> get(int gameId, int userId){
         Optional<Game> optionalGame = gameRepo.findById(gameId);
         if(optionalGame.isEmpty())
             return new DTO<Game>(404, "Game not found.", null);
-        return new DTO<Game>(200, "Game found.", optionalGame.get());
+        List<Game> games = new ArrayList<>();
+        games.add(optionalGame.get());
+        setExtraAtt(games, userId);
+        return new DTO<Game>(200, "Game found.", games.get(0));
     }
 
     /**
@@ -201,5 +223,46 @@ public class GameService {
             return new DTO<Boolean>(404, "Game not found.", false);
         gameRepo.delete(optionalGame.get());
         return new DTO<Boolean>(200, "Delete successful.", true);
+    }
+
+    public List<Game> getGamesByUserId(Integer userId){
+        Iterable<GameOwnership> ownedGames = gameOwnershipRepo.findAllByUserId(userId);
+        List<Game> games = new ArrayList<>();
+        for(GameOwnership ownedGame:ownedGames){
+            Optional<Game> game = gameRepo.findById(ownedGame.getGameId());
+            if(game.isPresent())
+                games.add(game.get());
+        }
+
+        setExtraAtt(games, userId);
+
+        return games;
+    }
+
+    public DTO<List<Game>> featured(Integer userId){
+        Iterable<GameOwnership> ownedGames = gameOwnershipRepo.findAllByUserId(userId);
+        Iterable<Game> allGames = gameRepo.findAll();
+        List<Game> games = new ArrayList<>();
+        setExtraAtt(games, userId);
+
+        List<Game> myGames = new ArrayList<>();
+        Set<Tag> ownedTags = new HashSet<>();
+        for(GameOwnership ownedGame : ownedGames){
+            Game myGame = gameRepo.findById(ownedGame.getGameId()).get();
+            myGames.add(myGame);
+            for(Tag tag : myGame.getTags()){
+                ownedTags.add(tag);
+            }
+        }
+        for(Game game : allGames){
+            if(!game.isOwned())
+                games.add(game);
+            for(Tag tag : game.getTags()){
+                if(ownedTags.contains(tag))
+                    game.setTagsInCommon(game.getTagsInCommon()+1);
+            }
+        }
+        Collections.sort(games, (g1, g2) -> (int)((g2.getTagsInCommon() - g1.getTagsInCommon())*100000 + g2.getSales()/1000 - g1.getSales()/1000));
+        return new DTO<List<Game>>(200, "Games found", games);
     }
 }

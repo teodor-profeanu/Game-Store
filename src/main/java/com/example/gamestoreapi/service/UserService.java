@@ -55,7 +55,7 @@ public class UserService {
         if(!Pattern.compile("^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+$").matcher(email).matches())
             return new DTO<Boolean>(400, "Invalid email.", false);
         if(!Pattern.compile("^[a-zA-Z0-9._-]+$").matcher(username).matches() || username.length()<3)
-            return new DTO<Boolean>(400, "Invalid username.", false);
+            return new DTO<Boolean>(400, "Invalid username (must contain only alphanumerical characters and must be at least 3 characters long).", false);
         if(password.length()<8)
             return new DTO<Boolean>(400, "Password must be at least 8 characters long.", false);
         if(password.compareTo(repeatPassword)!=0)
@@ -67,7 +67,7 @@ public class UserService {
         if(emailOptional.isPresent())
             return new DTO<Boolean>(400, "Email already taken.", false);
 
-        User user = new User(0, username, email, password, permissionRepo.findByName(GlobalTags.USER).get().getId(), new Date(System.currentTimeMillis()), null, null, null, "");
+        User user = new User(0, username, email, password, permissionRepo.findByName(GlobalTags.USER).get().getId(), new Date(System.currentTimeMillis()), null, null, "");
         userRepo.save(user);
         return new DTO<Boolean>(200, "Register successful.", true);
     }
@@ -76,7 +76,7 @@ public class UserService {
      * This method retrieves the user with the given ID, it makes the necessary changes, and then it saves it back in the DB.
      * @return Data transfer object with the status, message and a Boolean value
      */
-    public DTO<Boolean> edit(Integer userId, String nickname, String iconURL, String coverURL, String bio){
+    public DTO<Boolean> edit(Integer userId, String nickname, String iconURL, String bio){
         Optional<User> optionalUser = userRepo.findById(userId);
         if(optionalUser.isEmpty())
             return new DTO<Boolean>(404, "User not found.", false);
@@ -84,7 +84,6 @@ public class UserService {
         User user = optionalUser.get();
         user.setNickname(nickname);
         user.setIconURL(iconURL);
-        user.setCoverURL(coverURL);
         user.setBio(bio);
         userRepo.save(user);
 
