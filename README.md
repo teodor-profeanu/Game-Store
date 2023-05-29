@@ -20,8 +20,27 @@ Eu voi avea în total 9 tabele în baza de date.
 - GAME_OWNERSHIP - Detaliază jocurile deținute de diferiți jucători, precum și numărul de ore jucate de aceștia în cadrul jocurilor.
 - DISCOUNT - Tabelă pentru a stoca dicounturi, conține jocul care primește discountul, data până când este valabil și dimensiunea discountului.
 
+![alt text](https://github.com/teodor-profeanu/Game-Store/blob/tema3/db_diagram.png?raw=true?raw=true)
+
 ## Endpoints
 Toate requesturile returnează un obiect de tip DTO, care conține un int pentru status, un mesaj și obiectul care a fost cerut. Pentru interfața cu alte aplicații, acest API dispune de următoarele endpointuri:
 - GET /user/login - returnează un User în cazul în care a fost găsit cu emailul/username-ul și parola oferite ca parametrii. Exemplu: localhost:8080/user/login?usernameEmail=asmo_192&password=qwertyui
 - POST /user/register - înregistrează userul cu parametrii primiți și returnează True în cazul în care a fost înregistrat userul cu succes, altfel returnează false și codul 400. Exemplu : localhost:8080/user/register?username=dev&email=tores3@gmail.com&password=12345678&repeatPassword=12345678
 - PUT /user/edit - editează userul cu ID-ul dat și returnează True în cazul în care a fost editat userul cu succes. Exemplu: localhost:8080/user/edit?id=1&iconURL=staas
+- PUT /user/change-password - schimbă parola, returnează un mesaj sugestiv în cazul erorilor. Exemplu: localhost:8080/user/change-password?id=1&oldPassword=qwertyui&newPassword=12345678
+- GET /user - returnează userul cu id-ul specifical și lista lui de jocuri deținute. Exemplu: localhost:8080/user?id=1
+- POST /game/add - adaugă un joc în baza de date dacă are utilizatorul permisiunile necesare
+- GET /game/search - returnează o listă filtrată și ordonată după parametrii oferți
+- GET /game - returnează jocul cu id-ul specificat cu informații din mai multe tabele
+- PUT /game/edit - oferă posibilitatea de a edita un joc
+- DELETE /game/delete - pentru a șterge jocul cu id-ul specificat
+- GET /game/top-sellers - listă cu cele mai populare jocuri
+- GET /game/new-releases - listă cu cele mai noi jocuri
+- GET /game/trending - listă cu jocuri trending
+- GET /game/featured - listă cu jocuri aleasă în funcție de jocurile pe care le deține deja utiliatorul
+- POST /game/buy - cu metoda aceasta se poate simula cumpărarea unui joc
+- PUT /game/play - cu metoda asta se poate simula jucatul unui joc
+- GET /reviews - returnează review-urile de la jocul cu id-ul dat
+- POST /review/add - adaugă un review la un joc de la utilizatorul logat
+- DELETE /review/delete - șterge un review
+- GET /tags - returnează lista de taguri
