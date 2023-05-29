@@ -14,6 +14,7 @@ import java.util.List;
  * A controller class for handling http requests related to the USER table
  */
 @RestController
+@CrossOrigin("http://localhost:3000")
 public class UserController {
 
     private UserService userService;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping("/user/register")
-    public DTO<Boolean> register(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam String repeatPassword){
+    public DTO<Integer> register(@RequestParam String username, @RequestParam String email, @RequestParam String password, @RequestParam String repeatPassword){
         return userService.register(username, email, password, repeatPassword);
     }
 
@@ -51,8 +52,8 @@ public class UserController {
     }
 
     @PutMapping("/user/change-password")
-    public DTO<Boolean> changePassword(@RequestParam Integer id, @RequestParam String oldPassword, @RequestParam String newPassword, @RequestParam String repeatPassword){
-        return userService.changePassword(id, oldPassword, newPassword, repeatPassword);
+    public DTO<Boolean> changePassword(@RequestParam Integer id, @RequestParam String oldPassword, @RequestParam String newPassword){
+        return userService.changePassword(id, oldPassword, newPassword);
     }
 
     @DeleteMapping("/user/delete")

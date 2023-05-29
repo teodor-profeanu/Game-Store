@@ -9,5 +9,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface GameImagesRepo extends JpaRepository<GameImages,Integer> {
+    /**
+     * Returns an list of images for the specified game
+     */
     Iterable<GameImages> findAllByGameId(Integer gameId);
 }

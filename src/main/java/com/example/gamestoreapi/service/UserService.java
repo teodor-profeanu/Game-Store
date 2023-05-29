@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import com.example.gamestoreapi.helper.GlobalTags;
 
+/**
+ * Service Class for the logic behind UserController
+ */
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -51,25 +54,25 @@ public class UserService {
      * Checks whether the given data is invalid or already taken, and registers the user into the db.
      * @return Data transfer object with the status, message and a Boolean value
      */
-    public DTO<Boolean> register(String username, String email, String password, String repeatPassword){
+    public DTO<Integer> register(String username, String email, String password, String repeatPassword){
         if(!Pattern.compile("^[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+$").matcher(email).matches())
-            return new DTO<Boolean>(400, "Invalid email.", false);
+            return new DTO<>(400, "Invalid email.", 0);
         if(!Pattern.compile("^[a-zA-Z0-9._-]+$").matcher(username).matches() || username.length()<3)
-            return new DTO<Boolean>(400, "Invalid username (must contain only alphanumerical characters and must be at least 3 characters long).", false);
+            return new DTO<>(400, "Invalid username (must contain only alphanumerical characters and must be at least 3 characters long).", 0);
         if(password.length()<8)
-            return new DTO<Boolean>(400, "Password must be at least 8 characters long.", false);
+            return new DTO<>(400, "Password must be at least 8 characters long.", 0);
         if(password.compareTo(repeatPassword)!=0)
-            return new DTO<Boolean>(400, "Repeat password not the same as password.", false);
+            return new DTO<>(400, "Repeat password not the same as password.", 0);
         Optional<User> usernameOptional=userRepo.findByUsername(username);
         if(usernameOptional.isPresent())
-            return new DTO<Boolean>(400, "Username already taken.", false);
+            return new DTO<>(400, "Username already taken.", 0);
         Optional<User> emailOptional=userRepo.findByEmail(email);
         if(emailOptional.isPresent())
-            return new DTO<Boolean>(400, "Email already taken.", false);
+            return new DTO<>(400, "Email already taken.", 0);
 
         User user = new User(0, username, email, password, permissionRepo.findByName(GlobalTags.USER).get().getId(), new Date(System.currentTimeMillis()), null, null, "");
-        userRepo.save(user);
-        return new DTO<Boolean>(200, "Register successful.", true);
+        user = userRepo.save(user);
+        return new DTO<>(200, "Register successful.", user.getId());
     }
 
     /**
@@ -94,7 +97,7 @@ public class UserService {
      * Changes the password in the database with the new password for the user with ID userId.
      * @return Data transfer object with the status, message and a Boolean value
      */
-    public DTO<Boolean> changePassword(Integer userId, String oldPassword, String newPassword, String repeatPassword){
+    public DTO<Boolean> changePassword(Integer userId, String oldPassword, String newPassword){
         Optional<User> optionalUser = userRepo.findById(userId);
         if(optionalUser.isEmpty())
             return new DTO<Boolean>(404, "User not found.", false);
@@ -103,8 +106,6 @@ public class UserService {
             return new DTO<Boolean>(400, "Wrong password.", false);
         if(newPassword.length()<8)
             return new DTO<Boolean>(400, "Password must be at least 8 characters long.", false);
-        if(newPassword.compareTo(repeatPassword)!=0)
-            return new DTO<Boolean>(400, "Repeat password not the same as password.", false);
 
         user.setPassword(newPassword);
         userRepo.save(user);

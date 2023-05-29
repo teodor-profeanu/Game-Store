@@ -12,5 +12,10 @@ import java.util.Optional;
 @Repository
 public interface GameOwnershipRepo extends JpaRepository<GameOwnership,Integer> {
     Iterable<GameOwnership> findAllByGameIdAndUserId(Integer gameId, Integer userId);
+
+    /**
+     * Returns the GameOwnership that has the specified game and user ID
+     */
+    Optional<GameOwnership> findByGameIdAndUserId(Integer gameId, Integer userId);
     Iterable<GameOwnership> findAllByUserId(Integer userId);
 }

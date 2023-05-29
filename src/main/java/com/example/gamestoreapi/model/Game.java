@@ -82,5 +82,5 @@ public class Game {
 
     @Transient
     @JsonIgnore
-    private Integer tagsInCommon;
+    private int tagsInCommon = 0;
 }
